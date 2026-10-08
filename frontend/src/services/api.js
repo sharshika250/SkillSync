@@ -1,7 +1,10 @@
 /**
  * Centralized API service client for SkillSync.
  * Handles HTTP requests, authentication headers, and standard error handling.
+ * Supports configurable VITE_API_URL for production cloud deployments.
  */
+
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const getAuthHeaders = () => {
   const headers = {
@@ -47,7 +50,7 @@ const handleResponse = async (response) => {
 // 1. Auth Services
 export const authAPI = {
   async register(formData) {
-    const res = await fetch('/api/auth/register', {
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formData)
@@ -56,7 +59,7 @@ export const authAPI = {
   },
 
   async login(credentials) {
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials)
@@ -75,28 +78,28 @@ export const userAPI = {
     if (params.wantedSkill) query.append('wantedSkill', params.wantedSkill);
 
     const queryString = query.toString() ? `?${query.toString()}` : '';
-    const res = await fetch(`/api/users${queryString}`, {
+    const res = await fetch(`${API_BASE}/api/users${queryString}`, {
       headers: getAuthHeaders()
     });
     return handleResponse(res);
   },
 
   async getUserById(id) {
-    const res = await fetch(`/api/users/${id}`, {
+    const res = await fetch(`${API_BASE}/api/users/${id}`, {
       headers: getAuthHeaders()
     });
     return handleResponse(res);
   },
 
   async getProfile() {
-    const res = await fetch('/api/users/profile', {
+    const res = await fetch(`${API_BASE}/api/users/profile`, {
       headers: getAuthHeaders()
     });
     return handleResponse(res);
   },
 
   async updateProfile(profileData) {
-    const res = await fetch('/api/users/profile', {
+    const res = await fetch(`${API_BASE}/api/users/profile`, {
       method: 'PUT',
       headers: getAuthHeaders(),
       body: JSON.stringify(profileData)
@@ -108,7 +111,7 @@ export const userAPI = {
 // 3. Exchange Request Services
 export const requestAPI = {
   async createRequest(payload) {
-    const res = await fetch('/api/requests', {
+    const res = await fetch(`${API_BASE}/api/requests`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(payload)
@@ -118,14 +121,14 @@ export const requestAPI = {
 
   async getRequests(type) {
     const query = type ? `?type=${type}` : '';
-    const res = await fetch(`/api/requests${query}`, {
+    const res = await fetch(`${API_BASE}/api/requests${query}`, {
       headers: getAuthHeaders()
     });
     return handleResponse(res);
   },
 
   async acceptRequest(id) {
-    const res = await fetch(`/api/requests/${id}/accept`, {
+    const res = await fetch(`${API_BASE}/api/requests/${id}/accept`, {
       method: 'PUT',
       headers: getAuthHeaders()
     });
@@ -133,7 +136,7 @@ export const requestAPI = {
   },
 
   async rejectRequest(id) {
-    const res = await fetch(`/api/requests/${id}/reject`, {
+    const res = await fetch(`${API_BASE}/api/requests/${id}/reject`, {
       method: 'PUT',
       headers: getAuthHeaders()
     });
@@ -141,7 +144,7 @@ export const requestAPI = {
   },
 
   async cancelRequest(id) {
-    const res = await fetch(`/api/requests/${id}/cancel`, {
+    const res = await fetch(`${API_BASE}/api/requests/${id}/cancel`, {
       method: 'PUT',
       headers: getAuthHeaders()
     });
@@ -152,14 +155,14 @@ export const requestAPI = {
 // 4. Matches & Recommendations Services
 export const matchAPI = {
   async getMatches() {
-    const res = await fetch('/api/matches', {
+    const res = await fetch(`${API_BASE}/api/matches`, {
       headers: getAuthHeaders()
     });
     return handleResponse(res);
   },
 
   async getRecommendations() {
-    const res = await fetch('/api/matches/recommendations', {
+    const res = await fetch(`${API_BASE}/api/matches/recommendations`, {
       headers: getAuthHeaders()
     });
     return handleResponse(res);
