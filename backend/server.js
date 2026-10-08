@@ -26,11 +26,26 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (e.g. mobile apps, curl, server-to-server) or allowed origins
-    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development') {
+    // 1. Allow requests with no origin (e.g. curl, postman, mobile apps)
+    if (!origin) return callback(null, true);
+
+    // 2. Allow all in development mode
+    if (process.env.NODE_ENV === 'development') return callback(null, true);
+
+    // 3. Allow wildcard configuration
+    if (frontendUrl === '*' || allowedOrigins.includes('*')) return callback(null, true);
+
+    // 4. Normalize origin (strip trailing slashes)
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    const isExplicitlyAllowed = allowedOrigins.some(o => o && o.replace(/\/$/, '') === normalizedOrigin);
+    if (isExplicitlyAllowed) return callback(null, true);
+
+    // 5. Automatically allow any Vercel production or preview deployments
+    if (normalizedOrigin.endsWith('.vercel.app')) {
       return callback(null, true);
     }
-    return callback(new Error('Blocked by CORS policy'));
+
+    return callback(new Error(`Blocked by CORS policy: origin ${origin} is not allowed`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
