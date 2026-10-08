@@ -1,0 +1,24 @@
+# Environment variables (SECURITY: Never commit live credentials)
+.env
+*.env
+.env.*
+backend/.env
+
+# Node dependencies
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist/
+**/dist/
+build/
+**/build/
+
+# Logs and OS files
+*.log
+**/*.log
+.DS_Store
+Thumbs.db
