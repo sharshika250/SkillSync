@@ -1,6 +1,16 @@
 import mongoose from 'mongoose';
 import User from '../models/User.js';
-import { calculateMatchScore } from '../services/matchingService.js';
+import { calculateMatchScore, calculateDetailedMatchScore } from '../services/matchingService.js';
+
+// Category mapping helper
+const CATEGORY_MAP = {
+  programming: ['python', 'java', 'c++', 'c#', 'golang', 'rust', 'c', 'backend'],
+  web: ['react', 'javascript', 'html', 'css', 'node.js', 'vue', 'angular', 'next.js', 'frontend'],
+  design: ['ui/ux', 'ui/ux design', 'figma', 'adobe xd', 'photoshop', 'illustrator', 'design'],
+  datascience: ['data science', 'machine learning', 'ai', 'pandas', 'numpy', 'sql', 'deep learning'],
+  business: ['project management', 'marketing', 'finance', 'entrepreneurship', 'public speaking', 'business'],
+  communication: ['english', 'spanish', 'communication', 'writing', 'presentation']
+};
 
 /**
  * @desc    Get all users (excluding current user if authenticated)
@@ -9,12 +19,20 @@ import { calculateMatchScore } from '../services/matchingService.js';
  */
 export const getAllUsers = async (req, res, next) => {
   try {
-    const { search, skill, offeredSkill, wantedSkill } = req.query;
+    const { search, skill, offeredSkill, wantedSkill, category, verifiedOnly, sortBy } = req.query;
     const filter = {};
 
     // Exclude currently logged in user if available
     if (req.user?._id) {
       filter._id = { $ne: req.user._id };
+    }
+
+    // Exclude suspended accounts from public search
+    filter.isSuspended = { $ne: true };
+
+    // Verified only filter
+    if (verifiedOnly === 'true' || verifiedOnly === true) {
+      filter.verification = true;
     }
 
     // Keyword search across name, role, bio, and skills
@@ -46,6 +64,17 @@ export const getAllUsers = async (req, res, next) => {
       filter.skillsWanted = new RegExp(wantedSkill.trim(), 'i');
     }
 
+    // Category filter
+    if (category && category !== 'All') {
+      const catKey = category.toLowerCase().replace(/[^a-z]/g, '');
+      const keywords = CATEGORY_MAP[catKey] || [category.toLowerCase()];
+      const catRegexList = keywords.map(kw => new RegExp(kw, 'i'));
+      filter.$or = [
+        { skillsOffered: { $in: catRegexList } },
+        { skillsWanted: { $in: catRegexList } }
+      ];
+    }
+
     const rawUsers = await User.find(filter)
       .select('-password')
       .sort({ createdAt: -1 });
@@ -54,17 +83,30 @@ export const getAllUsers = async (req, res, next) => {
     const users = rawUsers.map(user => {
       const userObj = user.toJSON();
       let matchScore = 0;
+      let matchDetails = null;
+
       if (req.user) {
-        matchScore = calculateMatchScore(req.user, user);
+        const detailed = calculateDetailedMatchScore(req.user, user);
+        matchScore = detailed.score;
+        matchDetails = {
+          factors: detailed.factors,
+          explanations: detailed.explanations,
+          isReciprocal: detailed.isReciprocal
+        };
       }
       return {
         ...userObj,
-        matchScore
+        matchScore,
+        matchDetails
       };
     });
 
-    // If current user is logged in, sort by matchScore descending, then trustScore
-    if (req.user) {
+    // Sorting
+    if (sortBy === 'recent') {
+      users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    } else if (sortBy === 'rating') {
+      users.sort((a, b) => (b.trustScore || 0) - (a.trustScore || 0));
+    } else if (req.user) {
       users.sort((a, b) => b.matchScore - a.matchScore);
     }
 
@@ -104,15 +146,24 @@ export const getUserById = async (req, res, next) => {
 
     const userObj = user.toJSON();
     let matchScore = 0;
+    let matchDetails = null;
+
     if (req.user) {
-      matchScore = calculateMatchScore(req.user, user);
+      const detailed = calculateDetailedMatchScore(req.user, user);
+      matchScore = detailed.score;
+      matchDetails = {
+        factors: detailed.factors,
+        explanations: detailed.explanations,
+        isReciprocal: detailed.isReciprocal
+      };
     }
 
     return res.status(200).json({
       success: true,
       user: {
         ...userObj,
-        matchScore
+        matchScore,
+        matchDetails
       }
     });
   } catch (error) {
@@ -167,7 +218,11 @@ export const updateProfile = async (req, res, next) => {
       skillsOffered,
       skillsWanted,
       proficiency,
-      availability
+      availability,
+      avatar,
+      portfolioLinks,
+      certificates,
+      teachingExperience
     } = req.body;
 
     if (name !== undefined) {
@@ -185,11 +240,37 @@ export const updateProfile = async (req, res, next) => {
     }
 
     if (role !== undefined) {
-      user.role = typeof role === 'string' ? role.trim() : 'Student';
+      // Disallow setting 'Admin' via profile update unless user is already admin
+      const requestedRole = typeof role === 'string' ? role.trim() : 'Student';
+      if (requestedRole.toLowerCase() === 'admin' && !user.isAdmin) {
+        user.role = 'Student';
+      } else {
+        user.role = requestedRole;
+      }
     }
 
     if (location !== undefined) {
       user.location = typeof location === 'string' ? location.trim() : '';
+    }
+
+    if (avatar !== undefined) {
+      user.avatar = typeof avatar === 'string' ? avatar.trim() : '';
+    }
+
+    if (portfolioLinks && typeof portfolioLinks === 'object') {
+      user.portfolioLinks = {
+        github: portfolioLinks.github || '',
+        linkedin: portfolioLinks.linkedin || '',
+        website: portfolioLinks.website || ''
+      };
+    }
+
+    if (Array.isArray(certificates)) {
+      user.certificates = certificates.filter(c => c && c.title);
+    }
+
+    if (teachingExperience !== undefined) {
+      user.teachingExperience = typeof teachingExperience === 'string' ? teachingExperience.trim() : '';
     }
 
     if (skillsOffered !== undefined) {
@@ -197,6 +278,22 @@ export const updateProfile = async (req, res, next) => {
         user.skillsOffered = skillsOffered
           .map(s => (typeof s === 'string' ? s.trim() : ''))
           .filter(Boolean);
+
+        // Ensure new offered skills have a corresponding entry in skillVerifications if missing
+        if (!user.skillVerifications) user.skillVerifications = [];
+        for (const s of user.skillsOffered) {
+          const exists = user.skillVerifications.some(v => v.skill.toLowerCase() === s.toLowerCase());
+          if (!exists) {
+            user.skillVerifications.push({
+              skill: s,
+              status: 'SELF_DECLARED',
+              score: 0,
+              claimedProficiency: (user.proficiency && user.proficiency[s]) || 'Intermediate',
+              demonstratedProficiency: 'Not Demonstrated',
+              verifiedAt: new Date()
+            });
+          }
+        }
       }
     }
 
@@ -223,6 +320,24 @@ export const updateProfile = async (req, res, next) => {
       success: true,
       message: 'Profile updated successfully',
       user: updatedUser.toJSON()
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Delete account (self-service account deletion)
+ * @route   DELETE /api/users/profile
+ * @access  Private
+ */
+export const deleteAccount = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    await User.findByIdAndDelete(userId);
+    return res.status(200).json({
+      success: true,
+      message: 'Account deleted successfully'
     });
   } catch (error) {
     next(error);

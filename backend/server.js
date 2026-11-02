@@ -4,10 +4,19 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
+import { seedAssessmentQuestions } from './config/seedAssessments.js';
+
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import requestRoutes from './routes/requestRoutes.js';
 import matchRoutes from './routes/matchRoutes.js';
+import assessmentRoutes from './routes/assessmentRoutes.js';
+import sessionRoutes from './routes/sessionRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import learningRoutes from './routes/learningRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import communicationRoutes from './routes/communicationRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -76,6 +85,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/matches', matchRoutes);
+app.use('/api/assessments', assessmentRoutes);
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/learning', learningRoutes);
+app.use('/api/ai', aiRoutes);
+app.use('/api', communicationRoutes); // handles /api/messages & /api/notifications
+app.use('/api/admin', adminRoutes);
 
 // 404 Handler for unknown routes
 app.use((req, res) => {
@@ -105,6 +121,9 @@ const startServer = async () => {
       console.info('Please verify your MONGO_URI in backend/.env and ensure your MongoDB instance is running.');
       return;
     }
+
+    // Seed default assessment question bank
+    await seedAssessmentQuestions();
 
     app.listen(PORT, () => {
       console.log(`SkillSync backend server running on port ${PORT}`);

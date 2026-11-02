@@ -58,7 +58,54 @@ const userSchema = new mongoose.Schema(
     trustScore: {
       type: Number,
       default: 0
-    }
+    },
+    avatar: {
+      type: String,
+      default: ''
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false
+    },
+    isSuspended: {
+      type: Boolean,
+      default: false
+    },
+    portfolioLinks: {
+      github: { type: String, default: '' },
+      linkedin: { type: String, default: '' },
+      website: { type: String, default: '' }
+    },
+    certificates: [
+      {
+        title: { type: String, required: true },
+        issuer: { type: String, default: '' },
+        date: { type: String, default: '' },
+        url: { type: String, default: '' }
+      }
+    ],
+    teachingExperience: {
+      type: String,
+      default: ''
+    },
+    badges: {
+      type: [String],
+      default: []
+    },
+    skillVerifications: [
+      {
+        skill: { type: String, required: true },
+        status: {
+          type: String,
+          enum: ['SELF_DECLARED', 'ASSESSMENT_PASSED', 'SKILL_VERIFIED'],
+          default: 'SELF_DECLARED'
+        },
+        score: { type: Number, default: 0 },
+        claimedProficiency: { type: String, default: 'Intermediate' },
+        demonstratedProficiency: { type: String, default: 'Not Demonstrated' },
+        verifiedAt: { type: Date, default: Date.now }
+      }
+    ]
   },
   {
     timestamps: true

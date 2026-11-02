@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { requestAPI } from '../services/api';
 import { useSkillSync } from '../context/SkillSyncContext';
-import { HandshakeIcon } from '../components/Icons';
 
 const Requests = () => {
   const navigate = useNavigate();
@@ -93,81 +92,66 @@ const Requests = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'accepted':
-        return (
-          <span style={{ backgroundColor: '#d1fae5', color: '#047857', padding: '0.25rem 0.75rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: '600', textTransform: 'capitalize' }}>
-            Accepted
-          </span>
-        );
+        return <span className="badge badge-success">Accepted</span>;
       case 'rejected':
-        return (
-          <span style={{ backgroundColor: '#fee2e2', color: '#b91c1c', padding: '0.25rem 0.75rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: '600', textTransform: 'capitalize' }}>
-            Declined
-          </span>
-        );
+        return <span className="badge badge-blush" style={{ color: '#7A3D4C' }}>Declined</span>;
       case 'cancelled':
-        return (
-          <span style={{ backgroundColor: '#f3f4f6', color: '#6b7280', padding: '0.25rem 0.75rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: '600', textTransform: 'capitalize' }}>
-            Cancelled
-          </span>
-        );
+        return <span className="badge" style={{ backgroundColor: '#EFE7E9', color: '#89818A' }}>Cancelled</span>;
       default:
-        return (
-          <span style={{ backgroundColor: '#fef3c7', color: '#b45309', padding: '0.25rem 0.75rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: '600', textTransform: 'capitalize' }}>
-            Pending
-          </span>
-        );
+        return <span className="badge badge-peach">Pending</span>;
     }
   };
 
   return (
-    <div className="page-container" style={{ padding: '3.5rem 5%', maxWidth: '1000px', margin: '0 auto' }}>
+    <div style={{ padding: '3.5rem 6%', maxWidth: '1040px', margin: '0 auto' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '2.25rem', marginBottom: '0.25rem' }}>Exchange Requests</h1>
-          <p style={{ color: 'var(--text-light)', fontSize: '1rem' }}>
+          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.35rem', color: '#39343A' }}>Exchange Requests</h1>
+          <p style={{ color: '#89818A', fontSize: '1rem' }}>
             Manage incoming proposals and track requests you've sent to peers
           </p>
         </div>
-        <button onClick={() => navigate('/explore')} className="btn btn-primary" style={{ padding: '0.6rem 1.25rem' }}>
+        <button onClick={() => navigate('/explore')} className="btn btn-primary">
           + Propose New Exchange
         </button>
       </div>
 
       {actionSuccess && (
-        <div style={{ backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0', color: '#047857', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ backgroundColor: '#EBF7F1', border: '1px solid #B8E4CF', color: '#2F6C4C', padding: '1rem', borderRadius: '0.75rem', marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <span>{actionSuccess}</span>
-          <button onClick={() => setActionSuccess('')} style={{ background: 'none', border: 'none', color: '#047857', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
+          <button onClick={() => setActionSuccess('')} style={{ background: 'none', border: 'none', color: '#2F6C4C', cursor: 'pointer', fontWeight: 700 }}>✕</button>
         </div>
       )}
 
       {error && (
-        <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem' }}>
+        <div style={{ backgroundColor: '#FDF4F6', border: '1px solid #F2CBD5', color: '#7A3D4C', padding: '1rem', borderRadius: '0.75rem', marginBottom: '1.5rem' }}>
           {error}
         </div>
       )}
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: '1rem', borderBottom: '2px solid var(--border-color)', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid #EFE7E9', marginBottom: '2rem' }}>
         <button
           onClick={() => setActiveTab('received')}
           style={{
             padding: '0.75rem 1.5rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'received' ? '3px solid var(--primary-color)' : '3px solid transparent',
-            color: activeTab === 'received' ? 'var(--primary-color)' : 'var(--text-light)',
-            fontWeight: activeTab === 'received' ? '700' : '500',
+            borderBottom: activeTab === 'received' ? '3px solid #D99AAA' : '3px solid transparent',
+            color: activeTab === 'received' ? '#39343A' : '#89818A',
+            fontWeight: activeTab === 'received' ? 700 : 500,
             fontSize: '1rem',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem'
+            gap: '0.5rem',
+            transition: 'all 0.15s ease'
           }}
         >
           Received Requests
-          <span style={{ backgroundColor: activeTab === 'received' ? 'var(--primary-color)' : 'var(--border-color)', color: activeTab === 'received' ? 'white' : 'var(--text-dark)', padding: '0.1rem 0.5rem', borderRadius: '1rem', fontSize: '0.75rem' }}>
+          <span style={{ backgroundColor: activeTab === 'received' ? '#D99AAA' : '#EFE7E9', color: activeTab === 'received' ? 'white' : '#89818A', padding: '0.1rem 0.55rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700 }}>
             {receivedRequests.length}
           </span>
         </button>
@@ -178,18 +162,19 @@ const Requests = () => {
             padding: '0.75rem 1.5rem',
             background: 'none',
             border: 'none',
-            borderBottom: activeTab === 'sent' ? '3px solid var(--primary-color)' : '3px solid transparent',
-            color: activeTab === 'sent' ? 'var(--primary-color)' : 'var(--text-light)',
-            fontWeight: activeTab === 'sent' ? '700' : '500',
+            borderBottom: activeTab === 'sent' ? '3px solid #D99AAA' : '3px solid transparent',
+            color: activeTab === 'sent' ? '#39343A' : '#89818A',
+            fontWeight: activeTab === 'sent' ? 700 : 500,
             fontSize: '1rem',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: '0.5rem'
+            gap: '0.5rem',
+            transition: 'all 0.15s ease'
           }}
         >
           Sent Requests
-          <span style={{ backgroundColor: activeTab === 'sent' ? 'var(--primary-color)' : 'var(--border-color)', color: activeTab === 'sent' ? 'white' : 'var(--text-dark)', padding: '0.1rem 0.5rem', borderRadius: '1rem', fontSize: '0.75rem' }}>
+          <span style={{ backgroundColor: activeTab === 'sent' ? '#D99AAA' : '#EFE7E9', color: activeTab === 'sent' ? 'white' : '#89818A', padding: '0.1rem 0.55rem', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700 }}>
             {sentRequests.length}
           </span>
         </button>
@@ -198,8 +183,8 @@ const Requests = () => {
       {/* Loading State */}
       {loading && (
         <div style={{ textAlign: 'center', padding: '4rem 1rem' }}>
-          <div style={{ display: 'inline-block', width: '36px', height: '36px', border: '3px solid #e0e7ff', borderTop: '3px solid var(--primary-color)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-          <p style={{ marginTop: '1rem', color: 'var(--text-light)' }}>Fetching exchange requests...</p>
+          <div style={{ display: 'inline-block', width: '36px', height: '36px', border: '3px solid #F5E1E5', borderTop: '3px solid #D99AAA', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+          <p style={{ marginTop: '1rem', color: '#89818A' }}>Fetching exchange requests...</p>
         </div>
       )}
 
@@ -207,13 +192,13 @@ const Requests = () => {
       {!loading && activeTab === 'received' && (
         <div>
           {receivedRequests.length === 0 ? (
-            <div style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border-color)', borderRadius: '1rem', padding: '3.5rem 2rem', textAlign: 'center' }}>
+            <div className="card" style={{ padding: '3.5rem 2rem', textAlign: 'center' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>📬</div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Received Requests</h3>
-              <p style={{ color: 'var(--text-light)', marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#39343A' }}>No Received Requests</h3>
+              <p style={{ color: '#89818A', marginBottom: '1.5rem' }}>
                 When other students request to learn from you or propose a skill exchange, their proposals will appear here.
               </p>
-              <button onClick={() => navigate('/profile')} className="btn btn-secondary">
+              <button onClick={() => navigate('/profile')} className="btn btn-secondary btn-sm">
                 Update Your Offered Skills
               </button>
             </div>
@@ -226,23 +211,23 @@ const Requests = () => {
                 const initials = senderName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
                 return (
-                  <div key={req._id} style={{ backgroundColor: 'var(--white)', borderRadius: '1rem', border: '1px solid var(--border-color)', padding: '1.75rem', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+                  <div key={req._id} className="card" style={{ padding: '1.75rem' }}>
                     
                     {/* Header */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: 'var(--primary-color)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                        <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#F5E1E5', color: '#7A3D4C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, border: '1px solid #F2CBD5' }}>
                           {initials}
                         </div>
                         <div>
-                          <h3 style={{ margin: 0, fontSize: '1.15rem' }}>{senderName}</h3>
-                          <span style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>{senderRole}</span>
+                          <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#39343A' }}>{senderName}</h3>
+                          <span style={{ color: '#89818A', fontSize: '0.85rem' }}>{senderRole}</span>
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         {req.matchScore > 0 && (
-                          <span style={{ backgroundColor: '#e0e7ff', color: 'var(--primary-color)', padding: '0.2rem 0.6rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: '700' }}>
+                          <span className="badge badge-blush">
                             {req.matchScore}% Match
                           </span>
                         )}
@@ -251,16 +236,16 @@ const Requests = () => {
                     </div>
 
                     {/* Skill Exchange Details */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', backgroundColor: '#f8fafc', padding: '1.25rem', borderRadius: '0.5rem', marginBottom: '1.25rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', backgroundColor: '#FFFBFA', padding: '1.25rem', borderRadius: '0.75rem', border: '1px solid #EFE7E9', marginBottom: '1.25rem' }}>
                       <div>
-                        <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-light)', fontWeight: '600' }}>They Offer To Teach:</span>
-                        <p style={{ fontWeight: '600', color: 'var(--primary-color)', marginTop: '0.2rem', fontSize: '0.95rem' }}>
+                        <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#89818A', fontWeight: 700, letterSpacing: '0.04em' }}>They Offer To Teach:</span>
+                        <p style={{ fontWeight: 700, color: '#D99AAA', marginTop: '0.2rem', fontSize: '0.98rem' }}>
                           {req.offeredSkill}
                         </p>
                       </div>
                       <div>
-                        <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-light)', fontWeight: '600' }}>They Want To Learn:</span>
-                        <p style={{ fontWeight: '600', color: 'var(--secondary-color)', marginTop: '0.2rem', fontSize: '0.95rem' }}>
+                        <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#89818A', fontWeight: 700, letterSpacing: '0.04em' }}>They Want To Learn:</span>
+                        <p style={{ fontWeight: 700, color: '#8E7CB3', marginTop: '0.2rem', fontSize: '0.98rem' }}>
                           {req.requestedSkill}
                         </p>
                       </div>
@@ -268,14 +253,14 @@ const Requests = () => {
 
                     {/* Message */}
                     {req.message && (
-                      <div style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', backgroundColor: 'var(--white)', borderLeft: '3px solid var(--primary-color)', fontSize: '0.9rem', color: 'var(--text-dark)' }}>
+                      <div style={{ marginBottom: '1.5rem', padding: '0.85rem 1.1rem', backgroundColor: '#FDF4F6', borderLeft: '3px solid #D99AAA', borderRadius: '0 0.5rem 0.5rem 0', fontSize: '0.9rem', color: '#39343A', fontStyle: 'italic' }}>
                         "{req.message}"
                       </div>
                     )}
 
                     {/* Footer / Actions */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #EFE7E9', paddingTop: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                      <span style={{ fontSize: '0.8rem', color: '#89818A' }}>
                         Received on {new Date(req.createdAt).toLocaleDateString()}
                       </span>
 
@@ -284,22 +269,21 @@ const Requests = () => {
                           <button
                             onClick={() => handleReject(req._id)}
                             disabled={processingId === req._id}
-                            className="btn btn-secondary"
-                            style={{ borderColor: '#ef4444', color: '#ef4444', padding: '0.5rem 1rem', fontSize: '0.875rem' }}
+                            className="btn btn-secondary btn-sm"
+                            style={{ borderColor: '#F2CBD5', color: '#7A3D4C' }}
                           >
                             Decline
                           </button>
                           <button
                             onClick={() => handleAccept(req._id)}
                             disabled={processingId === req._id}
-                            className="btn btn-primary"
-                            style={{ backgroundColor: '#059669', borderColor: '#059669', padding: '0.5rem 1.25rem', fontSize: '0.875rem' }}
+                            className="btn btn-primary btn-sm"
                           >
                             {processingId === req._id ? 'Accepting...' : 'Accept Exchange'}
                           </button>
                         </div>
                       ) : req.status === 'accepted' ? (
-                        <button onClick={() => navigate('/matches')} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                        <button onClick={() => navigate('/matches')} className="btn btn-primary btn-sm">
                           View Active Match &rarr;
                         </button>
                       ) : null}
@@ -317,13 +301,13 @@ const Requests = () => {
       {!loading && activeTab === 'sent' && (
         <div>
           {sentRequests.length === 0 ? (
-            <div style={{ backgroundColor: 'var(--white)', border: '1px solid var(--border-color)', borderRadius: '1rem', padding: '3.5rem 2rem', textAlign: 'center' }}>
+            <div className="card" style={{ padding: '3.5rem 2rem', textAlign: 'center' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🚀</div>
-              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>No Sent Requests</h3>
-              <p style={{ color: 'var(--text-light)', marginBottom: '1.5rem' }}>
+              <h3 style={{ fontSize: '1.25rem', marginBottom: '0.5rem', color: '#39343A' }}>No Sent Requests</h3>
+              <p style={{ color: '#89818A', marginBottom: '1.5rem' }}>
                 You haven't sent any skill exchange proposals yet. Explore community profiles to find partners!
               </p>
-              <button onClick={() => navigate('/explore')} className="btn btn-primary">
+              <button onClick={() => navigate('/explore')} className="btn btn-primary btn-sm">
                 Explore Skills Now
               </button>
             </div>
@@ -336,23 +320,23 @@ const Requests = () => {
                 const initials = receiverName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
                 return (
-                  <div key={req._id} style={{ backgroundColor: 'var(--white)', borderRadius: '1rem', border: '1px solid var(--border-color)', padding: '1.75rem', boxShadow: '0 4px 6px rgba(0,0,0,0.02)' }}>
+                  <div key={req._id} className="card" style={{ padding: '1.75rem' }}>
                     
                     {/* Header */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: 'var(--secondary-color)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                        <div style={{ width: '42px', height: '42px', borderRadius: '50%', backgroundColor: '#EAE5F4', color: '#554471', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, border: '1px solid #D7CEE9' }}>
                           {initials}
                         </div>
                         <div>
-                          <h3 style={{ margin: 0, fontSize: '1.15rem' }}>Sent to {receiverName}</h3>
-                          <span style={{ color: 'var(--text-light)', fontSize: '0.85rem' }}>{receiverRole}</span>
+                          <h3 style={{ margin: 0, fontSize: '1.15rem', color: '#39343A' }}>Sent to {receiverName}</h3>
+                          <span style={{ color: '#89818A', fontSize: '0.85rem' }}>{receiverRole}</span>
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         {req.matchScore > 0 && (
-                          <span style={{ backgroundColor: '#e0e7ff', color: 'var(--primary-color)', padding: '0.2rem 0.6rem', borderRadius: '1rem', fontSize: '0.8rem', fontWeight: '700' }}>
+                          <span className="badge badge-blush">
                             {req.matchScore}% Match
                           </span>
                         )}
@@ -361,16 +345,16 @@ const Requests = () => {
                     </div>
 
                     {/* Skill Details */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', backgroundColor: '#f8fafc', padding: '1.25rem', borderRadius: '0.5rem', marginBottom: '1.25rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', backgroundColor: '#FFFBFA', padding: '1.25rem', borderRadius: '0.75rem', border: '1px solid #EFE7E9', marginBottom: '1.25rem' }}>
                       <div>
-                        <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-light)', fontWeight: '600' }}>You Offered To Teach:</span>
-                        <p style={{ fontWeight: '600', color: 'var(--primary-color)', marginTop: '0.2rem', fontSize: '0.95rem' }}>
+                        <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#89818A', fontWeight: 700, letterSpacing: '0.04em' }}>You Offered To Teach:</span>
+                        <p style={{ fontWeight: 700, color: '#D99AAA', marginTop: '0.2rem', fontSize: '0.98rem' }}>
                           {req.offeredSkill}
                         </p>
                       </div>
                       <div>
-                        <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', color: 'var(--text-light)', fontWeight: '600' }}>You Requested To Learn:</span>
-                        <p style={{ fontWeight: '600', color: 'var(--secondary-color)', marginTop: '0.2rem', fontSize: '0.95rem' }}>
+                        <span style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: '#89818A', fontWeight: 700, letterSpacing: '0.04em' }}>You Requested To Learn:</span>
+                        <p style={{ fontWeight: 700, color: '#8E7CB3', marginTop: '0.2rem', fontSize: '0.98rem' }}>
                           {req.requestedSkill}
                         </p>
                       </div>
@@ -378,14 +362,14 @@ const Requests = () => {
 
                     {/* Message */}
                     {req.message && (
-                      <div style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', backgroundColor: 'var(--white)', borderLeft: '3px solid var(--secondary-color)', fontSize: '0.9rem', color: 'var(--text-dark)' }}>
+                      <div style={{ marginBottom: '1.5rem', padding: '0.85rem 1.1rem', backgroundColor: '#FDF4F6', borderLeft: '3px solid #D99AAA', borderRadius: '0 0.5rem 0.5rem 0', fontSize: '0.9rem', color: '#39343A', fontStyle: 'italic' }}>
                         "{req.message}"
                       </div>
                     )}
 
                     {/* Footer / Cancel Action */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #EFE7E9', paddingTop: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                      <span style={{ fontSize: '0.8rem', color: '#89818A' }}>
                         Sent on {new Date(req.createdAt).toLocaleDateString()}
                       </span>
 
@@ -393,15 +377,15 @@ const Requests = () => {
                         <button
                           onClick={() => handleCancel(req._id)}
                           disabled={processingId === req._id}
-                          className="btn btn-ghost"
-                          style={{ color: '#ef4444', fontSize: '0.85rem' }}
+                          className="btn btn-ghost btn-sm"
+                          style={{ color: '#7A3D4C' }}
                         >
                           {processingId === req._id ? 'Cancelling...' : 'Cancel Request'}
                         </button>
                       )}
 
                       {req.status === 'accepted' && (
-                        <button onClick={() => navigate('/matches')} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                        <button onClick={() => navigate('/matches')} className="btn btn-primary btn-sm">
                           View Active Match &rarr;
                         </button>
                       )}

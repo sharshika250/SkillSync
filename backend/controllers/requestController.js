@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import ExchangeRequest from '../models/ExchangeRequest.js';
 import User from '../models/User.js';
+import Notification from '../models/Notification.js';
 import { calculateMatchScore } from '../services/matchingService.js';
 
 /**
@@ -298,7 +299,7 @@ export const cancelRequest = async (req, res, next) => {
 };
 
 /**
- * @desc    Get all accepted matches for current user
+ * @desc    Get all accepted and completed matches for current user
  * @route   GET /api/requests/matches (also wired to /api/matches)
  * @access  Private
  */
@@ -308,10 +309,10 @@ export const getUserMatches = async (req, res, next) => {
 
     const acceptedRequests = await ExchangeRequest.find({
       $or: [{ sender: userId }, { receiver: userId }],
-      status: 'accepted'
+      status: { $in: ['accepted', 'completed'] }
     })
-      .populate('sender', 'name email role bio skillsOffered skillsWanted trustScore verification availability')
-      .populate('receiver', 'name email role bio skillsOffered skillsWanted trustScore verification availability')
+      .populate('sender', 'name email role bio skillsOffered skillsWanted trustScore verification availability badges skillVerifications')
+      .populate('receiver', 'name email role bio skillsOffered skillsWanted trustScore verification availability badges skillVerifications')
       .sort({ updatedAt: -1 });
 
     const matches = acceptedRequests.map(item => {
@@ -328,6 +329,10 @@ export const getUserMatches = async (req, res, next) => {
         partnerSkill,
         matchScore: item.matchScore,
         status: item.status,
+        senderConfirmedCompleted: item.senderConfirmedCompleted,
+        receiverConfirmedCompleted: item.receiverConfirmedCompleted,
+        isCompleted: item.status === 'completed',
+        canLeaveReview: item.status === 'completed',
         createdAt: item.createdAt,
         updatedAt: item.updatedAt
       };
@@ -337,6 +342,110 @@ export const getUserMatches = async (req, res, next) => {
       success: true,
       count: matches.length,
       matches
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * @desc    Confirm exchange completion (requires dual confirmation to finalize)
+ * @route   PUT /api/requests/:id/complete
+ * @access  Private
+ */
+export const confirmCompletion = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid request ID'
+      });
+    }
+
+    const request = await ExchangeRequest.findById(id);
+    if (!request) {
+      return res.status(404).json({
+        success: false,
+        message: 'Exchange request not found'
+      });
+    }
+
+    const isSender = String(request.sender) === String(userId);
+    const isReceiver = String(request.receiver) === String(userId);
+
+    if (!isSender && !isReceiver) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only participants of this exchange can confirm completion'
+      });
+    }
+
+    if (request.status !== 'accepted' && request.status !== 'completed') {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot complete an exchange that is ${request.status}`
+      });
+    }
+
+    if (isSender) {
+      request.senderConfirmedCompleted = true;
+    }
+    if (isReceiver) {
+      request.receiverConfirmedCompleted = true;
+    }
+
+    // If both confirmed (or if one confirms and other already confirmed), mark COMPLETED
+    let isFullyCompleted = false;
+    if (request.senderConfirmedCompleted && request.receiverConfirmedCompleted) {
+      request.status = 'completed';
+      request.completedAt = new Date();
+      isFullyCompleted = true;
+
+      // Increment trust scores for both participants (+5 points for completing an exchange)
+      await User.findByIdAndUpdate(request.sender, { $inc: { trustScore: 5 } });
+      await User.findByIdAndUpdate(request.receiver, { $inc: { trustScore: 5 } });
+
+      // Notify both participants
+      await Notification.create([
+        {
+          user: request.sender,
+          type: 'accepted',
+          title: 'Skill Exchange Completed! 🎓',
+          message: `Both you and your partner confirmed completion. You can now leave a review for your partner.`,
+          link: '/matches'
+        },
+        {
+          user: request.receiver,
+          type: 'accepted',
+          title: 'Skill Exchange Completed! 🎓',
+          message: `Both you and your partner confirmed completion. You can now leave a review for your partner.`,
+          link: '/matches'
+        }
+      ]);
+    } else {
+      // Notify other participant to confirm
+      const otherUserId = isSender ? request.receiver : request.sender;
+      await Notification.create({
+        user: otherUserId,
+        type: 'request',
+        title: 'Partner Confirmed Session Completion',
+        message: `Your partner marked your skill exchange as completed. Please confirm completion to unlock reviews.`,
+        link: '/matches'
+      });
+    }
+
+    await request.save();
+
+    return res.status(200).json({
+      success: true,
+      message: isFullyCompleted
+        ? 'Skill exchange fully completed by both members! Reviews are now unlocked.'
+        : 'Your completion confirmation recorded. Waiting for partner confirmation.',
+      request,
+      isFullyCompleted
     });
   } catch (error) {
     next(error);

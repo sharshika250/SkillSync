@@ -39,7 +39,32 @@ export const requireAuth = async (req, res, next) => {
 };
 
 /**
- * Optional authentication middleware:
+ * Admin authorization middleware:
+ * Requires user to be authenticated and have isAdmin === true or role === 'Admin'
+ */
+export const requireAdmin = async (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required'
+      });
+    }
+
+    if (!req.user.isAdmin && req.user.role !== 'Admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied: Administrator privileges required.'
+      });
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Attaches user to req.user if valid credentials exist, but does not block unauthenticated access.
  */
 export const optionalAuth = async (req, res, next) => {

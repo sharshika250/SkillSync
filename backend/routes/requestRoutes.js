@@ -5,7 +5,8 @@ import {
   acceptRequest,
   rejectRequest,
   cancelRequest,
-  getUserMatches
+  getUserMatches,
+  confirmCompletion
 } from '../controllers/requestController.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
 
@@ -20,5 +21,6 @@ router.get('/matches', getUserMatches);
 router.put('/:id/accept', acceptRequest);
 router.put('/:id/reject', rejectRequest);
 router.put('/:id/cancel', cancelRequest);
+router.put('/:id/complete', confirmCompletion);
 
 export default router;

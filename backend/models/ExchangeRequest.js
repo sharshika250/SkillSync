@@ -36,10 +36,21 @@ const exchangeRequestSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: {
-        values: ['pending', 'accepted', 'rejected', 'cancelled'],
+        values: ['pending', 'accepted', 'rejected', 'cancelled', 'completed'],
         message: '{VALUE} is not a valid exchange request status'
       },
       default: 'pending'
+    },
+    senderConfirmedCompleted: {
+      type: Boolean,
+      default: false
+    },
+    receiverConfirmedCompleted: {
+      type: Boolean,
+      default: false
+    },
+    completedAt: {
+      type: Date
     }
   },
   {

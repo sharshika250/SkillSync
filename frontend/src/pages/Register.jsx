@@ -75,71 +75,73 @@ const Register = () => {
   };
 
   return (
-    <div className="page-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '4rem 5%', minHeight: '80vh' }}>
-      <div className="auth-card" style={{ width: '100%', maxWidth: '450px', padding: '2.5rem', backgroundColor: 'var(--white)', borderRadius: '1rem', boxShadow: '0 4px 6px rgba(0,0,0,0.05)', border: '1px solid var(--border-color)' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '0.5rem', fontSize: '1.75rem' }}>Create an Account</h2>
-        <p style={{ textAlign: 'center', color: 'var(--text-light)', marginBottom: '2rem', fontSize: '0.95rem' }}>Join the SkillSync peer learning community</p>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '4.5rem 5%', minHeight: '80vh', backgroundColor: '#FFFBFA' }}>
+      <div className="card" style={{ width: '100%', maxWidth: '460px', padding: '2.5rem', borderRadius: '1.25rem', boxShadow: '0 10px 30px rgba(57, 52, 58, 0.05)' }}>
+        <h2 style={{ textAlign: 'center', marginBottom: '0.4rem', fontSize: '1.75rem', fontWeight: 800 }}>Create an Account</h2>
+        <p style={{ textAlign: 'center', color: '#89818A', marginBottom: '2rem', fontSize: '0.95rem' }}>
+          Join the SkillSync peer learning community
+        </p>
 
         {error && (
-          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', color: '#b91c1c', padding: '0.75rem 1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+          <div style={{ backgroundColor: '#FDF4F6', border: '1px solid #F2CBD5', color: '#7A3D4C', padding: '0.75rem 1rem', borderRadius: '0.75rem', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
             {error}
           </div>
         )}
 
         {success && (
-          <div style={{ backgroundColor: '#ecfdf5', border: '1px solid #a7f3d0', color: '#047857', padding: '0.75rem 1rem', borderRadius: '0.5rem', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+          <div style={{ backgroundColor: '#EBF7F1', border: '1px solid #B8E4CF', color: '#2F6C4C', padding: '0.75rem 1rem', borderRadius: '0.75rem', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
             {success}
           </div>
         )}
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>Full Name</label>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Full Name</label>
             <input 
               type="text" 
               name="name"
+              className="form-input"
               value={formData.name}
               onChange={handleChange}
-              style={{ width: '100%', padding: '0.75rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)', fontSize: '1rem' }}
-              placeholder="e.g. Alex Chen"
+              placeholder="e.g. Maya Chen"
               disabled={loading}
               required 
             />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>Email Address</label>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Email Address</label>
             <input 
               type="email" 
               name="email"
+              className="form-input"
               value={formData.email}
               onChange={handleChange}
-              style={{ width: '100%', padding: '0.75rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)', fontSize: '1rem' }}
-              placeholder="alex@university.edu"
+              placeholder="you@university.edu"
               disabled={loading}
               required 
             />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>Password (min 6 characters)</label>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Password (min 6 characters)</label>
             <input 
               type="password" 
               name="password"
+              className="form-input"
               value={formData.password}
               onChange={handleChange}
-              style={{ width: '100%', padding: '0.75rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)', fontSize: '1rem' }}
               placeholder="••••••••"
               disabled={loading}
               required 
             />
           </div>
-          <div>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500', fontSize: '0.9rem' }}>Confirm Password</label>
+          <div className="form-group" style={{ marginBottom: 0 }}>
+            <label className="form-label">Confirm Password</label>
             <input 
               type="password" 
               name="confirmPassword"
+              className="form-input"
               value={formData.confirmPassword}
               onChange={handleChange}
-              style={{ width: '100%', padding: '0.75rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)', fontSize: '1rem' }}
               placeholder="••••••••"
               disabled={loading}
               required 
@@ -151,12 +153,15 @@ const Register = () => {
             style={{ marginTop: '0.5rem', width: '100%', padding: '0.75rem' }}
             disabled={loading}
           >
-            {loading ? 'Creating Account...' : 'Register'}
+            {loading ? 'Registering...' : 'Create Account'}
           </button>
         </form>
 
-        <div style={{ marginTop: '1.5rem', textAlign: 'center', color: 'var(--text-light)', fontSize: '0.9rem' }}>
-          Already have an account? <Link to="/login" style={{ color: 'var(--primary-color)', textDecoration: 'none', fontWeight: '600' }}>Login</Link>
+        <div style={{ marginTop: '1.75rem', textAlign: 'center', color: '#89818A', fontSize: '0.9rem' }}>
+          Already have an account?{' '}
+          <Link to="/login" style={{ color: '#D99AAA', textDecoration: 'none', fontWeight: 700 }}>
+            Sign In
+          </Link>
         </div>
       </div>
     </div>

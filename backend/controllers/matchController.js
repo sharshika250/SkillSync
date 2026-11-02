@@ -1,9 +1,9 @@
 import User from '../models/User.js';
-import { calculateMatchScore } from '../services/matchingService.js';
+import { calculateDetailedMatchScore } from '../services/matchingService.js';
 import { getUserMatches } from './requestController.js';
 
 /**
- * @desc    Get top recommended matches for the logged-in user
+ * @desc    Get top recommended matches for the logged-in user with explainable breakdown
  * @route   GET /api/matches/recommendations
  * @access  Private
  */
@@ -14,10 +14,15 @@ export const getRecommendations = async (req, res, next) => {
     const allOtherUsers = await User.find({ _id: { $ne: currentUser._id } }).select('-password');
 
     const scoredUsers = allOtherUsers.map(user => {
-      const matchScore = calculateMatchScore(currentUser, user);
+      const detailed = calculateDetailedMatchScore(currentUser, user);
       return {
         ...user.toJSON(),
-        matchScore
+        matchScore: detailed.score,
+        matchDetails: {
+          factors: detailed.factors,
+          explanations: detailed.explanations,
+          isReciprocal: detailed.isReciprocal
+        }
       };
     });
 

@@ -7,8 +7,9 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node test-suite.js",
+    "test:advanced": "node test-advanced-suite.js",
     "test:scenario": "node test-e2e-scenario.js",
-    "test:all": "node test-registration.js && node test-suite.js && node test-e2e-scenario.js"
+    "test:all": "node test-registration.js && node test-suite.js && node test-advanced-suite.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
