@@ -4,8 +4,9 @@
  * Supports configurable VITE_API_URL for production cloud deployments.
  */
 
-const RAW_API_BASE = import.meta.env.VITE_API_URL || '';
+const RAW_API_BASE = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? '' : 'https://skillsync-backend-swo6.onrender.com');
 const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
+
 
 
 const getAuthHeaders = () => {
