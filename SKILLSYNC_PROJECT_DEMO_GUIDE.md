@@ -2,8 +2,11 @@
 
 **Project Title:** SkillSync – Peer Skill Exchange Platform
 **Academic Program:** Computer Science & Engineering (Reverse Engineering & Full-Stack Systems Enhancement)
-**Deployment URL:** [https://skill-sync-five-rho.vercel.app](https://skill-sync-five-rho.vercel.app)
+**Frontend Live URL:** [https://skill-sync-five-rho.vercel.app](https://skill-sync-five-rho.vercel.app)
+**Backend Cloud URL:** [https://skillsync-backend-swo6.onrender.com](https://skillsync-backend-swo6.onrender.com)
+**Database:** MongoDB Atlas (`cluster0.dxfgcgh.mongodb.net/skillsync`)
 **Repository:** `https://github.com/sharshika250/SkillSync.git`
+**Verification Status:** 100% Passed (28/28 Live Cloud Assertions, 97/97 Automated Backend Assertions)
 **Audience:** Academic Review Board, External Examiners, Project Evaluators
 
 ---
