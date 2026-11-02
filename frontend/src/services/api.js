@@ -4,7 +4,9 @@
  * Supports configurable VITE_API_URL for production cloud deployments.
  */
 
-const API_BASE = import.meta.env.VITE_API_URL || '';
+const RAW_API_BASE = import.meta.env.VITE_API_URL || '';
+const API_BASE = RAW_API_BASE.replace(/\/+$/, '');
+
 
 const getAuthHeaders = () => {
   const headers = {
